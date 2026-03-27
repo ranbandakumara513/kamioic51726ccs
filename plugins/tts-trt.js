@@ -308,7 +308,7 @@ async (conn, mek, m, { from, q, reply }) => {
 //   .sinhala — Dedicated Sinhala TTS
 // ═══════════════════════════════════════════
 cmd({
-  pattern:  'sinhala',
+  pattern:  'tts2',
   alias:    ['ttssin', 'sitts', 'sivoice'],
   desc:     'සිංහල Text to Voice Note',
   category: 'tools',
@@ -336,7 +336,7 @@ async (conn, mek, m, { from, q, reply }) => {
 //   .tts2 — English TTS fast
 // ═══════════════════════════════════════════
 cmd({
-  pattern:  'ttsen',
+  pattern:  'tts3',
   alias:    ['entts', 'envoice'],
   desc:     'English Text to Voice Note',
   category: 'tools',
@@ -354,7 +354,7 @@ async (conn, mek, m, { from, q, reply }) => {
     await conn.sendMessage(from, { react: { text: '✅', key: mek.key } });
 
   } catch (e) {
-    console.log('[TTS2 ERROR]:', e.message);
+    console.log('[TTS3 ERROR]:', e.message);
     await conn.sendMessage(from, { react: { text: '❌', key: mek.key } }).catch(()=>{});
     reply(`❌ *TTS Failed:* ${e.message}`);
   }
