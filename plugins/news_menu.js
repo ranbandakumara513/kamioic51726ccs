@@ -23,7 +23,10 @@ END:VCARD`
     }
 };
 
-// MENU COMMAND
+let activeMenus = {}; // 🔥 simple session tracking
+
+
+// ================= MENU =================
 cmd({
     pattern: "newsmenu",
     desc: "News menu",
@@ -42,57 +45,76 @@ async (conn, mek, m, { from }) => {
 👉 Reply with *1* or *2*
 `;
 
-    await conn.sendMessage(from, {
+    let sentMsg = await conn.sendMessage(from, {
         image: { url: menuImage },
         caption: menuText
     }, { quoted: fakevCard });
 
+    // Save menu message id
+    activeMenus[from] = sentMsg.key;
+
 });
 
 
-// HANDLE REPLY
+// ================= HANDLE REPLY =================
 cmd({
     on: "text"
 },
-async (conn, mek, m, { from, body, reply }) => {
+async (conn, mek, m, { from, body }) => {
 
-    if (!m.quoted) return;
+    try {
 
-    let quotedText = m.quoted.text || "";
+        // must have quoted message
+        if (!m.quoted) return;
 
-    // Only trigger if replying to our menu
-    if (!quotedText.includes("NEWS MENU")) return;
+        let quotedText =
+            m.quoted.message?.conversation ||
+            m.quoted.text ||
+            "";
 
-    if (body === "1") {
-        return await sendSirasa(conn, from, m);
-    }
+        // check if it is menu
+        if (!quotedText.includes("NEWS MENU")) return;
 
-    if (body === "2") {
-        return await sendBBC(conn, from, m);
+        let text = body.trim();
+
+        if (text === "1") {
+            await conn.sendMessage(from, {
+                react: { text: "⏳", key: m.key }
+            });
+
+            await sendSirasa(conn, from, m);
+
+        } else if (text === "2") {
+            await conn.sendMessage(from, {
+                react: { text: "⏳", key: m.key }
+            });
+
+            await sendBBC(conn, from, m);
+
+        }
+
+    } catch (e) {
+        console.log(e);
     }
 
 });
 
 
-// 🔵 Sirasa News
+// ================= SIRASA =================
 async function sendSirasa(conn, from, m) {
     try {
-
-        // ⏳ React (Processing)
-        await conn.sendMessage(from, {
-            react: { text: "⏳", key: m.key }
-        });
 
         const res = await axios.get("https://appi.srihub.store/news/sirasa?apikey=dew_1TqE8N6MtFQH7myhpydg9K0XCgjNJVwyUJEE0Pic");
 
         if (!res.data.status) {
-            await conn.sendMessage(from, {
+            return await conn.sendMessage(from, {
                 react: { text: "❌", key: m.key }
             });
-            return;
         }
 
-        const newsList = Array.isArray(res.data.result) ? res.data.result : [res.data.result];
+        const newsList = Array.isArray(res.data.result)
+            ? res.data.result
+            : [res.data.result];
 
         for (let news of newsList) {
 
@@ -104,8 +126,6 @@ async function sendSirasa(conn, from, m) {
 ${news.desc}
 
 🔗 ${news.url}
-
-> © Powered by RANUMITHA-X-MD 🌛
             `;
 
             if (news.image) {
@@ -120,14 +140,12 @@ ${news.desc}
             await new Promise(r => setTimeout(r, 500));
         }
 
-        // ✅ Success React
         await conn.sendMessage(from, {
             react: { text: "✅", key: m.key }
         });
 
     } catch (err) {
         console.log(err);
-
         await conn.sendMessage(from, {
             react: { text: "❌", key: m.key }
         });
@@ -135,25 +153,21 @@ ${news.desc}
 }
 
 
-// 🔴 BBC News
+// ================= BBC =================
 async function sendBBC(conn, from, m) {
     try {
-
-        // ⏳ React
-        await conn.sendMessage(from, {
-            react: { text: "⏳", key: m.key }
-        });
 
         const res = await axios.get("https://appi.srihub.store/news/bbc?apikey=dew_1TqE8N6MtFQH7myhpydg9K0XCgjNJVwyUJEE0Pic");
 
         if (!res.data.status) {
-            await conn.sendMessage(from, {
+            return await conn.sendMessage(from, {
                 react: { text: "❌", key: m.key }
             });
-            return;
         }
 
-        const newsList = Array.isArray(res.data.result) ? res.data.result : [res.data.result];
+        const newsList = Array.isArray(res.data.result)
+            ? res.data.result
+            : [res.data.result];
 
         for (let news of newsList) {
 
@@ -165,8 +179,6 @@ async function sendBBC(conn, from, m) {
 ${news.desc}
 
 🔗 ${news.url}
-
-> © Powered by RANUMITHA-X-MD 🌛
             `;
 
             if (news.image) {
@@ -181,16 +193,14 @@ ${news.desc}
             await new Promise(r => setTimeout(r, 500));
         }
 
-        // ✅ Success React
         await conn.sendMessage(from, {
             react: { text: "✅", key: m.key }
         });
 
     } catch (err) {
         console.log(err);
-
         await conn.sendMessage(from, {
             react: { text: "❌", key: m.key }
         });
     }
-}
+             }
