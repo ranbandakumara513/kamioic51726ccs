@@ -79,6 +79,6 @@ ${news.desc}
 
     } catch (err) {
         console.error(err);
-        reply("❌ Error: Cannot fetch Derana news.");
+        reply("❌ Error: Cannot fetch Sirasa news.");
     }
 });
