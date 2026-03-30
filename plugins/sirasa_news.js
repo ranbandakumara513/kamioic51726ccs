@@ -1,7 +1,6 @@
 const axios = require('axios');
 const { cmd } = require('../command');
 
-
 // Fake vCard
 const fakevCard = {
     key: {
@@ -37,12 +36,9 @@ async (conn, mek, m, { from, reply }) => {
         if (!response.data.status) 
             return reply("⚠️ Could not fetch Sirasa news.");
 
-        const newsList = response.data.result;  // ← API returns ALL NEWS
-
-        // If only 1 news came, convert to array
+        const newsList = response.data.result;
         const allNews = Array.isArray(newsList) ? newsList : [newsList];
 
-        // Loop through all news and send them one by one
         for (let news of allNews) {
 
             let message = `
@@ -58,21 +54,28 @@ ${news.desc}
             `;
 
             if (news.image) {
-                await conn.sendMessage(from, { 
-                    image: { url: news.image }, 
-                    caption: message 
-                });
+                await conn.sendMessage(
+                    from, 
+                    { 
+                        image: { url: news.image }, 
+                        caption: message 
+                    },
+                    { quoted: fakevCard } // ✅ vCard add here
+                );
             } else {
-                await conn.sendMessage(from, { text: message }, { quoted: fakevCard } );
+                await conn.sendMessage(
+                    from, 
+                    { text: message },
+                    { quoted: fakevCard } // ✅ vCard add here
+                );
             }
 
-            await new Promise(res => setTimeout(res, 500)); // small delay to avoid spam block
+            await new Promise(res => setTimeout(res, 500));
         }
 
-        // 🔥 FINAL MESSAGE after all news sent
         await conn.sendMessage(from, {
             text: "✅ *All news sent successfully!*"
-        });
+        }, { quoted: fakevCard });
 
     } catch (err) {
         console.error(err);
