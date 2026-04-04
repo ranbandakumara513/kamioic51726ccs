@@ -29,7 +29,7 @@ async (conn, mek, m, { from, sender, reply }) => {
         const ping = Date.now() - startTime;
 
         // Edit same message with ping result
-        const newText = `*Ping: _${ping}ms_ ${randomEmoji}*`;
+        const newText = `*Pong: _${ping}ms_ ${randomEmoji}*`;
 
         await conn.sendMessage(from, {
             edit: sentMsg.key,  // edit same message
@@ -113,7 +113,7 @@ async (conn, mek, m, { from, sender, reply }) => {
         }
 
         // Final message
-        const text = `*RANUMITHA-X-MD Ping: ${ping} ms ${randomEmoji}*\n> *sᴛᴀᴛᴜs: ${color} ${badge}*\n> *ᴠᴇʀsɪᴏɴ: ${config.BOT_VERSION}*`;
+        const text = `*RANUMITHA-X-MD Pong: ${ping} ms ${randomEmoji}*\n> *sᴛᴀᴛᴜs: ${color} ${badge}*\n> *ᴠᴇʀsɪᴏɴ: ${config.BOT_VERSION}*`;
 
         await conn.sendMessage(from, {
             text,
