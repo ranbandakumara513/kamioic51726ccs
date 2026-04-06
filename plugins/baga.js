@@ -4,8 +4,8 @@ const os = require("os");
 const { runtime } = require('../lib/functions');
 
 cmd({
-    pattern: "system",
-    alias: ["sinfo", "platform", "systemstatus", "systeminfo"],
+    pattern: "baga",
+    alias: ["sisnfo", "platfdorm", "systedmstatus", "systemindfo"],
     react: "🧬",
     desc: "Check bot system status.",
     category: "main",
