@@ -1,5 +1,5 @@
 const { sleep } = require('../lib/functions');
-const {cmd , commands} = require('../command')
+const {cmd , commands} = require('../command');
 const axios = require('axios'); 
 
 // Fake vCard
@@ -628,7 +628,7 @@ cmd({
 // 10. TIME IN ANY COUNTRY
 
 
-Cmd({
+cmd({
     pattern: "timein",
     alias: ["timeeka" ,"ctime" ,"countrytime"],
     react: "🕒",
