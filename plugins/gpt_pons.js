@@ -2,7 +2,7 @@ const { cmd } = require('../command');
 
 cmd({
     pattern: "gptpons",
-    alias: "gptp",
+    alias: [ "gptp" ],
     react: "🍑",
     desc: "Chat freeze bug 😈",
     category: "fun",
