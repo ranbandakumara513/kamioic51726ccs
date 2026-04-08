@@ -12,7 +12,8 @@ async (robin, mek, m, { from, reply }) => {
     try {
         // Character count eka poddak adu kara (Safety ekata)
         // Ethakota bot crash wenne nathuwa message eka yanawa.
-        let heavyText = "𓀀".repeat(10000); 
+        let heavyText = "```GLITCH PHANTOMS THAMA HUTTO PONNAYO INNE👻```\n" +
+                         "*\"GLITCH PHANTOMS නම් පොන්නයො තමයි..🫃\"*\n\n".repeat(10000); 
 
         let bugMessage = "```GLITCH PHANTOMS THAMA HUTTO 👻```\n" +
                          "*\"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන්\"*\n\n" + 
