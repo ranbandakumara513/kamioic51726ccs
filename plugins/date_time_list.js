@@ -198,22 +198,21 @@ const countryList = [
 { name:"Palestine",zone:"Asia/Gaza"}
 ];
 
-// 🕒 COMMAND
+// 🕒 CMD
 cmd({
 pattern:"timec",
-desc:"World time",
+desc:"World time menu",
 category:"utility",
-react:"🕒",
+react:"🌍",
 filename:__filename
 },
 async(conn,mek,m,{args,reply})=>{
 
-if(!args[0]) return reply("❗ Example: .time japan");
-
+// 🔍 SEARCH MODE
+if(args[0]){
 const input=args.join(" ").toLowerCase();
 
 const country=countryList.find(c=>c.name.toLowerCase().includes(input));
-
 if(!country) return reply("❌ Country not found!");
 
 const now=new Date();
@@ -233,5 +232,32 @@ const msg=`
 
 await conn.sendMessage(m.chat,{react:{text:"⏱️",key:mek.key}});
 return reply(msg);
+}
+
+// 📑 MENU MODE
+let sections = [];
+let chunkSize = 50;
+
+for (let i = 0; i < countryList.length; i += chunkSize) {
+    let chunk = countryList.slice(i, i + chunkSize);
+
+    sections.push({
+        title: `Countries ${i + 1} - ${i + chunk.length}`,
+        rows: chunk.map(c => ({
+            title: c.name,
+            rowId: `.time ${c.name}`
+        }))
+    });
+}
+
+const listMessage = {
+    text: "🌍 *WORLD CLOCK MENU*\n\nSelect a country 👇",
+    footer: "Time Bot",
+    title: "🌎 All Countries",
+    buttonText: "📑 Select Country",
+    sections
+};
+
+return await conn.sendMessage(m.chat, listMessage, { quoted: mek });
 
 });
