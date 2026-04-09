@@ -1,115 +1,94 @@
 const { cmd } = require('../command');
 
-// 🌍 Countries grouped (SIDE MENU feel)
-const regions = {
-    "🌏 Asia": [
-        { name:"Sri Lanka",zone:"Asia/Colombo"},
-        { name:"India",zone:"Asia/Kolkata"},
-        { name:"Japan",zone:"Asia/Tokyo"},
-        { name:"China",zone:"Asia/Shanghai"},
-        { name:"UAE",zone:"Asia/Dubai"}
-    ],
-    "🌍 Europe": [
-        { name:"United Kingdom",zone:"Europe/London"},
-        { name:"Germany",zone:"Europe/Berlin"},
-        { name:"France",zone:"Europe/Paris"},
-        { name:"Italy",zone:"Europe/Rome"}
-    ],
-    "🌎 America": [
-        { name:"United States",zone:"America/New_York"},
-        { name:"Canada",zone:"America/Toronto"},
-        { name:"Brazil",zone:"America/Sao_Paulo"}
-    ],
-    "🌍 Africa": [
-        { name:"South Africa",zone:"Africa/Johannesburg"},
-        { name:"Nigeria",zone:"Africa/Lagos"},
-        { name:"Egypt",zone:"Africa/Cairo"}
-    ]
-};
+// 🌍 COUNTRY LIST
+const countryList = [
+{ name:"Afghanistan",zone:"Asia/Kabul"},
+{ name:"Albania",zone:"Europe/Tirane"},
+{ name:"Algeria",zone:"Africa/Algiers"},
+{ name:"Andorra",zone:"Europe/Andorra"},
+{ name:"Angola",zone:"Africa/Luanda"},
+{ name:"Argentina",zone:"America/Argentina/Buenos_Aires"},
+{ name:"Australia",zone:"Australia/Sydney"},
+{ name:"Austria",zone:"Europe/Vienna"},
+{ name:"Bangladesh",zone:"Asia/Dhaka"},
+{ name:"Belgium",zone:"Europe/Brussels"},
+{ name:"Brazil",zone:"America/Sao_Paulo"},
+{ name:"Canada",zone:"America/Toronto"},
+{ name:"China",zone:"Asia/Shanghai"},
+{ name:"Denmark",zone:"Europe/Copenhagen"},
+{ name:"Egypt",zone:"Africa/Cairo"},
+{ name:"France",zone:"Europe/Paris"},
+{ name:"Germany",zone:"Europe/Berlin"},
+{ name:"India",zone:"Asia/Kolkata"},
+{ name:"Indonesia",zone:"Asia/Jakarta"},
+{ name:"Italy",zone:"Europe/Rome"},
+{ name:"Japan",zone:"Asia/Tokyo"},
+{ name:"Malaysia",zone:"Asia/Kuala_Lumpur"},
+{ name:"Maldives",zone:"Indian/Maldives"},
+{ name:"Nepal",zone:"Asia/Kathmandu"},
+{ name:"Netherlands",zone:"Europe/Amsterdam"},
+{ name:"New Zealand",zone:"Pacific/Auckland"},
+{ name:"Pakistan",zone:"Asia/Karachi"},
+{ name:"Philippines",zone:"Asia/Manila"},
+{ name:"Qatar",zone:"Asia/Qatar"},
+{ name:"Russia",zone:"Europe/Moscow"},
+{ name:"Saudi Arabia",zone:"Asia/Riyadh"},
+{ name:"Singapore",zone:"Asia/Singapore"},
+{ name:"South Africa",zone:"Africa/Johannesburg"},
+{ name:"South Korea",zone:"Asia/Seoul"},
+{ name:"Spain",zone:"Europe/Madrid"},
+{ name:"Sri Lanka",zone:"Asia/Colombo"},
+{ name:"Sweden",zone:"Europe/Stockholm"},
+{ name:"Switzerland",zone:"Europe/Zurich"},
+{ name:"Thailand",zone:"Asia/Bangkok"},
+{ name:"Turkey",zone:"Europe/Istanbul"},
+{ name:"UAE",zone:"Asia/Dubai"},
+{ name:"United Kingdom",zone:"Europe/London"},
+{ name:"United States",zone:"America/New_York"},
+{ name:"Vietnam",zone:"Asia/Ho_Chi_Minh"}
+];
 
-// 🔍 find country
-function findCountry(name){
-    for (let region in regions){
-        const found = regions[region].find(c =>
-            c.name.toLowerCase() === name.toLowerCase()
-        );
-        if(found) return found;
+// 📌 TIMELIST COMMAND
+cmd({
+    pattern: "timelist",
+    desc: "Show world time list",
+    category: "utility",
+    react: "🌍",
+    filename: __filename
+},
+async (conn, mek, m, { reply }) => {
+
+    let txt = "🌍 *WORLD TIME LIST*\n\n";
+    const now = new Date();
+
+    for (let i = 0; i < countryList.length; i++) {
+
+        const c = countryList[i];
+
+        const date = now.toLocaleDateString("en-GB", {
+            timeZone: c.zone,
+            day: "2-digit",
+            month: "short"
+        });
+
+        const time = now.toLocaleTimeString("en-GB", {
+            timeZone: c.zone,
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+        txt += `*${i + 1}.* ${c.name}\n📅 ${date} | 🕒 ${time}\n\n`;
+
+        // 🔥 split messages (avoid WhatsApp limit)
+        if ((i + 1) % 25 === 0) {
+            await conn.sendMessage(m.chat, { text: txt }, { quoted: mek });
+            txt = "";
+        }
     }
-    return null;
-}
 
-// 🕒 CMD
-cmd({
-pattern:"time",
-desc:"Side menu world clock",
-category:"utility",
-react:"🌍",
-filename:__filename
-},
-async(conn,mek,m,{args,reply})=>{
-
-// 👉 SELECTED COUNTRY
-if(args[0]){
-const input=args.join(" ");
-const country=findCountry(input);
-
-if(!country) return reply("❌ Country not found!");
-
-const now=new Date();
-
-const date=now.toLocaleDateString("en-GB",{timeZone:country.zone,weekday:"long",year:"numeric",month:"long",day:"numeric"});
-const time=now.toLocaleTimeString("en-GB",{timeZone:country.zone,hour:"2-digit",minute:"2-digit",second:"2-digit"});
-
-return reply(`
-╭───〔 🌍 WORLD CLOCK 〕───╮
-│
-│ 📍 ${country.name}
-│ 📅 ${date}
-│ 🕒 ${time}
-│
-╰────────────────────╯
-`);
-}
-
-// 👉 MAIN MENU (SIDE STYLE)
-const buttons = Object.keys(regions).map(r => ({
-buttonId: `.timeregion ${r}`,
-buttonText: { displayText: r },
-type: 1
-}));
-
-return conn.sendMessage(m.chat,{
-text:"🌍 *Select Region*",
-footer:"Time Bot",
-buttons: buttons,
-headerType:1
-},{quoted:mek});
-
-});
-
-// 🌍 REGION HANDLER
-cmd({
-pattern:"timeregion",
-category:"utility"
-},
-async(conn,mek,m,{args,reply})=>{
-
-const regionName = args.join(" ");
-const list = regions[regionName];
-
-if(!list) return reply("❌ Region not found!");
-
-const buttons = list.map(c => ({
-buttonId: `.time ${c.name}`,
-buttonText: { displayText: c.name },
-type: 1
-}));
-
-return conn.sendMessage(m.chat,{
-text:`📍 *${regionName} Countries*`,
-footer:"Select Country",
-buttons: buttons,
-headerType:1
-},{quoted:mek});
+    // send remaining text
+    if (txt.trim() !== "") {
+        await conn.sendMessage(m.chat, { text: txt }, { quoted: mek });
+    }
 
 });
