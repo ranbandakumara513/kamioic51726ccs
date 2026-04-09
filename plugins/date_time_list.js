@@ -7,8 +7,8 @@ const countries = Intl.supportedValuesOf("timeZone")
         const country = parts[parts.length - 1].replace(/_/g, " ");
         return { name: country, zone: tz };
     })
-    .filter((v, i, a) => a.findIndex(t => t.name === v.name) === i) // remove duplicates
-    .slice(0, 195); // limit to 195
+    .filter((v, i, a) => a.findIndex(t => t.name === v.name) === i)
+    .slice(0, 195);
 
 cmd({
     pattern: "timelist",
@@ -35,7 +35,8 @@ async (conn, mek, m, { reply }) => {
         const time = now.toLocaleTimeString("en-GB", {
             timeZone: c.zone,
             hour: "2-digit",
-            minute: "2-digit"
+            minute: "2-digit",
+            second: "2-digit"   // ✅ seconds added
         });
 
         txt += `*${i + 1}.* ${c.name}\n📅 ${date} | 🕒 ${time}\n\n`;
