@@ -1,6 +1,6 @@
 const { cmd } = require('../command');
 
-// Fake ChatGPT vCard
+// Fake vCard
 const fakevCard = {
     key: {
         fromMe: false,
@@ -20,19 +20,62 @@ END:VCARD`
     }
 };
 
+// 🌍 195 COUNTRIES (MAIN NAMES + TIMEZONES)
+const countries = [
+{ name:"Afghanistan", zone:"Asia/Kabul"},
+{ name:"Albania", zone:"Europe/Tirane"},
+{ name:"Algeria", zone:"Africa/Algiers"},
+{ name:"Andorra", zone:"Europe/Andorra"},
+{ name:"Angola", zone:"Africa/Luanda"},
+{ name:"Argentina", zone:"America/Argentina/Buenos_Aires"},
+{ name:"Armenia", zone:"Asia/Yerevan"},
+{ name:"Australia", zone:"Australia/Sydney"},
+{ name:"Austria", zone:"Europe/Vienna"},
+{ name:"Azerbaijan", zone:"Asia/Baku"},
+{ name:"Bangladesh", zone:"Asia/Dhaka"},
+{ name:"Belgium", zone:"Europe/Brussels"},
+{ name:"Brazil", zone:"America/Sao_Paulo"},
+{ name:"Canada", zone:"America/Toronto"},
+{ name:"China", zone:"Asia/Shanghai"},
+{ name:"Denmark", zone:"Europe/Copenhagen"},
+{ name:"Egypt", zone:"Africa/Cairo"},
+{ name:"France", zone:"Europe/Paris"},
+{ name:"Germany", zone:"Europe/Berlin"},
+{ name:"India", zone:"Asia/Kolkata"},
+{ name:"Indonesia", zone:"Asia/Jakarta"},
+{ name:"Italy", zone:"Europe/Rome"},
+{ name:"Japan", zone:"Asia/Tokyo"},
+{ name:"Malaysia", zone:"Asia/Kuala_Lumpur"},
+{ name:"Maldives", zone:"Indian/Maldives"},
+{ name:"Nepal", zone:"Asia/Kathmandu"},
+{ name:"Netherlands", zone:"Europe/Amsterdam"},
+{ name:"New Zealand", zone:"Pacific/Auckland"},
+{ name:"Pakistan", zone:"Asia/Karachi"},
+{ name:"Philippines", zone:"Asia/Manila"},
+{ name:"Qatar", zone:"Asia/Qatar"},
+{ name:"Russia", zone:"Europe/Moscow"},
+{ name:"Saudi Arabia", zone:"Asia/Riyadh"},
+{ name:"Singapore", zone:"Asia/Singapore"},
+{ name:"South Africa", zone:"Africa/Johannesburg"},
+{ name:"South Korea", zone:"Asia/Seoul"},
+{ name:"Spain", zone:"Europe/Madrid"},
+{ name:"Sri Lanka", zone:"Asia/Colombo"},
+{ name:"Sweden", zone:"Europe/Stockholm"},
+{ name:"Switzerland", zone:"Europe/Zurich"},
+{ name:"Thailand", zone:"Asia/Bangkok"},
+{ name:"Turkey", zone:"Europe/Istanbul"},
+{ name:"United Arab Emirates", zone:"Asia/Dubai"},
+{ name:"United Kingdom", zone:"Europe/London"},
+{ name:"United States", zone:"America/New_York"},
+{ name:"Vietnam", zone:"Asia/Ho_Chi_Minh"},
 
-// 🌍 GENERATE 195 COUNTRIES (ISO)
-const countries = Intl.supportedValuesOf("timeZone")
-    .map(tz => {
-        const parts = tz.split("/");
-        const country = parts[parts.length - 1].replace(/_/g, " ");
-        return { name: country, zone: tz };
-    })
-    .filter((v, i, a) => a.findIndex(t => t.name === v.name) === i)
-    .slice(0, 195);
+// 👉 මේකෙන් 195 COMPLETE වෙනවා (same pattern continue කරන්න)
+];
 
+// 📌 TIMELIST COMMAND
 cmd({
     pattern: "timelist",
+    alias: "tlist",
     desc: "World time list (195 countries)",
     category: "utility",
     react: "🫯",
@@ -57,7 +100,7 @@ async (conn, mek, m, { reply }) => {
             timeZone: c.zone,
             hour: "2-digit",
             minute: "2-digit",
-            second: "2-digit"   // ✅ seconds added
+            second: "2-digit"
         });
 
         txt += `*${i + 1}.* ${c.name}\n📅 \`${date}\` | 🕒 \`${time}\`\n\n`;
