@@ -26,8 +26,8 @@ END:VCARD`
 };
 
 cmd({
-  pattern: "song",
-  alias: ["play", "song1"],
+  pattern: "song2",
+  alias: ["play2", "songx2"],
   desc: "YouTube Song Downloader (Multi Reply + Voice Note Fixed)",
   category: "download",
   filename: __filename,
