@@ -5,7 +5,7 @@ cmd({
     alias: ["remove", "k"],
     desc: "Removes a user from the group by reply or mention",
     category: "admin",
-    react: "❌",
+    react: "🦶",
     filename: __filename
 },
 async (conn, mek, m, { from, isGroup, isBotAdmins, isOwner, reply }) => {
