@@ -6,8 +6,8 @@ const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 cmd({
-    pattern: "upload2",
-    alias: ["tourl2", "url2"],
+    pattern: "url2",
+    alias: ["tourl2", "upload2"],
     desc: "Upload media & get URL",
     category: "tools",
     react: "🖇️",
@@ -27,14 +27,16 @@ async (conn, mek, m, { from, reply }) => {
         );
 
         if (!type) {
-            return reply("❌ Reply to an Image/Video/Document/Sticker!");
+            return reply("*Reply to an Image/Video/Document/Sticker!*");
         }
 
+        // react
         await conn.sendMessage(from, { react: { text: "⬆️", key: mek.key } });
 
         const target = msg[type];
         let mime = target.mimetype || "";
 
+        // extension fix
         let ext = mime.split("/")[1]?.split(";")[0] || "bin";
         if (ext === "jpeg") ext = "jpg";
         if (mime.includes("quicktime")) ext = "mov";
@@ -44,17 +46,20 @@ async (conn, mek, m, { from, reply }) => {
             mime = "image/webp";
         }
 
+        // download type
         let dlType = "document";
         if (type === "imageMessage") dlType = "image";
         else if (type === "videoMessage") dlType = "video";
         else if (type === "stickerMessage") dlType = "sticker";
 
+        // download buffer
         const stream = await downloadContentFromMessage(target, dlType);
         let buffer = Buffer.from([]);
         for await (const chunk of stream) {
             buffer = Buffer.concat([buffer, chunk]);
         }
 
+        // upload
         const form = new FormData();
         form.append("file", buffer, {
             filename: `upload.${ext}`,
@@ -76,15 +81,21 @@ async (conn, mek, m, { from, reply }) => {
         const url = json.result.url;
         const size = (buffer.length / 1024 / 1024).toFixed(2);
 
-        const caption = `╭━━━〔 ☁️ *RANUMITHA UPLOADER* 〕━━━╮
+        const caption = `╭━━━〔 ☁️ *UPLOADER* 〕━━━╮
 ┃ 📄 File: upload.${ext}
 ┃ ⚖️ Size: ${size} MB
 ┃ 🔗 URL: ${url}
 ╰━━━━━━━━━━━━━━━━━━━╯
 > © Powerd by 𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗 🌛`;
 
-        await conn.sendMessage(from, { text: caption });
+        // ✅ reply to user message
+        await conn.sendMessage(from, {
+            text: caption
+        }, {
+            quoted: mek
+        });
 
+        // done react
         await conn.sendMessage(from, { react: { text: "✔️", key: mek.key } });
 
     } catch (e) {
