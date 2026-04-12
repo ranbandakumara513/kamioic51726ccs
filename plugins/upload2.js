@@ -81,11 +81,11 @@ async (conn, mek, m, { from, reply }) => {
         const url = json.result.url;
         const size = (buffer.length / 1024 / 1024).toFixed(2);
 
-        const caption = `╭━━━〔 ☁️ *UPLOADER* 〕━━━╮
+        const caption = `╭━━━━〔 ☁️ *VIP UPLOADER* 〕━━━━━╮
 ┃ 📄 File: upload.${ext}
 ┃ ⚖️ Size: ${size} MB
 ┃ 🔗 URL: ${url}
-╰━━━━━━━━━━━━━━━━━━━╯
+╰━━━━━━━━━━━━━━━━━━━━━━━━━╯
 
 > © Powerd by 𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗 🌛`;
 
