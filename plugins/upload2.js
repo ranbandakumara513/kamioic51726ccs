@@ -26,7 +26,7 @@ END:VCARD`
 
 cmd({
     pattern: "upload2",
-    alias: ["tourl2"],
+    alias: ["tourl2", "url2"],
     desc: "Upload media & get URL",
     category: "tools",
     react: "🖇️",
