@@ -5,25 +5,6 @@ const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 // dynamic fetch
 const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-// Fake Quote
-const metaQuote = {
-    key: {
-        remoteJid: "status@broadcast",
-        participant: "0@s.whatsapp.net",
-        fromMe: false,
-        id: "META_UPLOAD"
-    },
-    message: {
-        contactMessage: {
-            displayName: "WHITESHADOW CLOUD",
-            vcard: `BEGIN:VCARD
-VERSION:3.0
-FN:Whiteshadow Uploader
-END:VCARD`
-        }
-    }
-};
-
 cmd({
     pattern: "upload2",
     alias: ["tourl2", "url2"],
@@ -34,7 +15,6 @@ cmd({
 },
 async (conn, mek, m, { from, reply }) => {
     try {
-        // get quoted or direct message
         let msg = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage || mek.message;
 
         // view once fix
@@ -55,7 +35,6 @@ async (conn, mek, m, { from, reply }) => {
         const target = msg[type];
         let mime = target.mimetype || "";
 
-        // extension fix
         let ext = mime.split("/")[1]?.split(";")[0] || "bin";
         if (ext === "jpeg") ext = "jpg";
         if (mime.includes("quicktime")) ext = "mov";
@@ -65,23 +44,20 @@ async (conn, mek, m, { from, reply }) => {
             mime = "image/webp";
         }
 
-        // download type
         let dlType = "document";
         if (type === "imageMessage") dlType = "image";
         else if (type === "videoMessage") dlType = "video";
         else if (type === "stickerMessage") dlType = "sticker";
 
-        // download buffer
         const stream = await downloadContentFromMessage(target, dlType);
         let buffer = Buffer.from([]);
         for await (const chunk of stream) {
             buffer = Buffer.concat([buffer, chunk]);
         }
 
-        // upload
         const form = new FormData();
         form.append("file", buffer, {
-            filename: `Whiteshadow_${Date.now()}.${ext}`,
+            filename: `upload.${ext}`,
             contentType: mime
         });
 
@@ -100,23 +76,13 @@ async (conn, mek, m, { from, reply }) => {
         const url = json.result.url;
         const size = (buffer.length / 1024 / 1024).toFixed(2);
 
-        // nice caption
-        const caption = `╭━━━〔 ☁️ *RANUMITHA-X-MD UPLOADER* 〕━━━╮
-┃ 📄 *File:* Ranumitha.${ext}
-┃ ⚖️ *Size:* ${size} MB
-┃ 🔗 *URL:* ${url}
-╰━━━━━━━━━━━━━━━━━━━━━━━╯
+        const caption = `╭━━━〔 ☁️ *RANUMITHA UPLOADER* 〕━━━╮
+┃ 📄 File: upload.${ext}
+┃ ⚖️ Size: ${size} MB
+┃ 🔗 URL: ${url}
+╰━━━━━━━━━━━━━━━━━━━╯`;
 
-> © Powerd by 𝗥𝗔𝗡𝗨𝗠𝗜𝗧𝗛𝗔-𝗫-𝗠𝗗 🌛`;
-
-        // send result
-        await conn.sendMessage(from, {
-            text: caption,
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true
-            }
-        }, { quoted: metaQuote });
+        await conn.sendMessage(from, { text: caption });
 
         await conn.sendMessage(from, { react: { text: "✔️", key: mek.key } });
 
