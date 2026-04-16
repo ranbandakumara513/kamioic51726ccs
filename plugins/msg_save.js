@@ -4,63 +4,69 @@ const path = require("path");
 const { getContentType } = require("@whiskeysockets/baileys");
 
 // save folder
-const SAVE_DIR = "./saved_messages";
+const SAVE_DIR = path.join(__dirname, "../saved_messages");
 
 // create folder if not exists
 if (!fs.existsSync(SAVE_DIR)) {
-    fs.mkdirSync(SAVE_DIR);
+    fs.mkdirSync(SAVE_DIR, { recursive: true });
 }
 
-// get quoted message (same as your forward cmd)
-function getQuoted(message) {
+// extract message using getContentType
+function extractMessage(message) {
     if (!message) return null;
 
     const type = getContentType(message);
     if (!type) return null;
 
-    const content = message[type];
+    let content = message[type];
 
-    if (type === "ephemeralMessage") {
-        return getQuoted(content.message);
+    // viewOnce support (basic unwrap)
+    if (type === "viewOnceMessage" || type === "viewOnceMessageV2") {
+        content = content.message;
+        const innerType = getContentType(content);
+        if (innerType) {
+            return content[innerType];
+        }
     }
 
-    return content?.contextInfo?.quotedMessage || null;
+    return content;
 }
 
 cmd({
     pattern: "svx",
-    desc: "Save message as JSON",
+    desc: "Save message using getContentType",
     category: "tools",
     react: "💾",
     filename: __filename
 },
-async (conn, mek, m, { from, reply }) => {
+async (conn, mek, m, { reply }) => {
     try {
 
-        let quoted = getQuoted(mek.message);
+        const extracted = extractMessage(mek.message);
 
-        // if no reply → save current message
-        let msgToSave;
-
-        if (quoted) {
-            msgToSave = quoted;
-        } else if (mek.message) {
-            msgToSave = mek.message;
-        } else {
-            return reply("❌ Message ekak hoyaganna ba");
+        if (!extracted) {
+            return reply("❌ Message not found / unsupported type");
         }
 
-        // create file name
+        // file name
         const fileName = `${Date.now()}_${mek.key.id}.json`;
         const filePath = path.join(SAVE_DIR, fileName);
 
-        // save
-        fs.writeFileSync(filePath, JSON.stringify(msgToSave, null, 2));
+        // save full structured data
+        const saveData = {
+            type: getContentType(mek.message),
+            message: extracted,
+            from: mek.key.remoteJid,
+            sender: mek.key.participant || mek.key.remoteJid,
+            timestamp: Date.now()
+        };
 
-        reply(`✅ Message saved!\n📁 File: ${fileName}`);
+        fs.writeFileSync(filePath, JSON.stringify(saveData, null, 2));
+
+        reply(`✅ Saved Successfully!\n📁 ${fileName}`);
 
     } catch (err) {
-        console.log(err);
-        reply("❌ Error saving message");
+        console.log("SVX ERROR:", err);
+        reply("❌ Save failed");
     }
 });
