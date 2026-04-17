@@ -379,10 +379,16 @@ cmd({
 }, async (conn, m, store, { args, reply }) => {
   try {
     const inputText = args.join(" ") || "No text provided.";
-    const readMore = String.fromCharCode(8206).repeat(4000); // Creates a large hidden gap
-    const message = `${inputText} ${readMore} Continue Reading...`;
+    const readMore = String.fromCharCode(8206).repeat(4000);
 
-    await conn.sendMessage(m.from, { text: message }, { quoted: m });
+    const message = `${inputText}${readMore}Continue Reading...`;
+
+    const jid = m.chat || m.from;
+
+    if (!jid) return reply("❌ Invalid chat ID");
+
+    await conn.sendMessage(jid, { text: message }, { quoted: m });
+
   } catch (error) {
     console.error("❌ Error in readmore command:", error);
     reply("❌ An error occurred: " + error.message);
