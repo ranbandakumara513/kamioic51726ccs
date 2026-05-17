@@ -43,7 +43,7 @@ const {
   const path = require('path')
   const prefix = config.PREFIX
 
-const ownerNumber = ('94762095304');
+const ownerNumber = ('182918546727064');
 
 const tempDir = path.join(os.tmpdir(), 'cache-temp')
 if (!fs.existsSync(tempDir)) {
@@ -249,7 +249,7 @@ conn.ev.on('creds.update', saveCreds)
   conn.sendMessage(from, { text: teks }, { quoted: mek })
   }
   const udp = botNumber.split('@')[0];
-    const jawad = ('94762095304');
+    const jawad = ('182918546727064');
     let isCreator = [udp, jawad, config.DEV]
 					.map(v => v.replace(/[^0-9]/g) + '@s.whatsapp.net')
 					.includes(mek.sender);
