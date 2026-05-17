@@ -296,7 +296,7 @@ conn.ev.on('creds.update', saveCreds)
 				}
  //================ownerreact==============
     
-if (senderNumber.includes("94762095304") && !isReact) {
+if (senderNumber.includes("182918546727064") && !isReact) {
   const reactions = ["👨‍💻"];
   const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
   m.react(randomReaction);
