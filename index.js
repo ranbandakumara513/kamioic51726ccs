@@ -234,7 +234,7 @@ conn.ev.on('creds.update', saveCreds)
     try {
       groupMetadata = await conn.groupMetadata(from);
     } catch (e) {
-      // console.error('Failed to get group metadata:', e);
+       console.error('Failed to get group metadata:', e);
     }
   }
   const groupName = groupMetadata.subject;
