@@ -209,33 +209,6 @@ conn.ev.on('creds.update', saveCreds)
   const botNumber = conn.user.id.split(':')[0]
   const pushname = mek.pushName || 'Sin Nombre'
   const isMe = botNumber.includes(senderNumber)
-  const botLid = conn.user?.lid ? conn.user?.lid.split(":")[0] + "@lid" : null
-  const botLid2 = botLid ? botLid.split("@")[0] : null
-  const ownernum = [`272572046434350`]
-  const isbot = (senderNumber === botNumber || (botLid2 && senderNumber === botLid2))
-  const isdev = ownernum.includes(senderNumber)
-  const isMe = isbot ? isbot : isdev 
-  const isOwner = ownerNumber.includes(senderNumber) || isMe
-  const botNumber2 = await jidNormalizedUser(conn.user.id);
-
-  let groupMetadata = { subject: '', participants: [] }
-   if (isGroup) {
-    try {
-     groupMetadata = await conn.groupMetadata(from);
-    } catch (e) {
-    // console.error('Failed to get group metadata:', e);
-     }
-  }
-  const groupName = groupMetadata.subject;
-  const participants = groupMetadata.participants || [];
-  const groupAdmins = isGroup ? getGroupAdmins(participants) : [];
-  const isBotAdmins = isGroup ? isParticipantAdmin(participants, [botNumber2, botLid, botNumber + '@s.whatsapp.net']) : false;
-  const isAdmins = isGroup ? isParticipantAdmin(participants, [sender, senderNumber + '@s.whatsapp.net', senderNumber + '@lid']) : false;
-  const isReact = m.message.reactionMessage ? true : false
-	  
-  const reply = (teks) => {
-  conn.sendMessage(from, { text: teks }, { quoted: mek })
-  }
   const isOwner = ownerNumber.includes(senderNumber) || isMe
   const botNumber2 = await jidNormalizedUser(conn.user.id);
   const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
