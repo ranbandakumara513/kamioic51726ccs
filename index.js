@@ -84,6 +84,16 @@ const port = process.env.PORT || 9090;
 
 //=============================================
 
+// Helper function to check if a participant is admin (supports jid, lid, number)
+const isParticipantAdmin = (participants, targetJids) => {
+  if (!participants || !Array.isArray(participants)) return false;
+  return participants.some(p => 
+    targetJids.some(jid => 
+      jid && (p.id === jid || p.id === jid.split('@')[0] + '@s.whatsapp.net' || p.id === jid.split('@')[0] + '@lid')
+    ) && p.admin === 'admin'
+  );
+};
+
 async function connectToWA() {
 console.log("Connecting 🪄 RANUMITHA 🏮");
   const { state, saveCreds } = await useMultiFileAuthState(
@@ -208,16 +218,33 @@ conn.ev.on('creds.update', saveCreds)
   const senderNumber = sender.split('@')[0]
   const botNumber = conn.user.id.split(':')[0]
   const pushname = mek.pushName || 'Sin Nombre'
-  const isMe = botNumber.includes(senderNumber)
+  
+  // ================ NEW SNIPPET INSERTED AT LINE 211 ================
+  const botLid = conn.user?.lid ? conn.user?.lid.split(":")[0] + "@lid" : null
+  const botLid2 = botLid ? botLid.split("@")[0] : null
+  const ownernum = [`182918546727064`]  // Add your dev numbers here
+  const isbot = (senderNumber === botNumber || (botLid2 && senderNumber === botLid2))
+  const isdev = ownernum.includes(senderNumber)
+  const isMe = isbot ? isbot : isdev 
   const isOwner = ownerNumber.includes(senderNumber) || isMe
   const botNumber2 = await jidNormalizedUser(conn.user.id);
-  const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
-  const groupName = isGroup ? groupMetadata.subject : ''
-  const participants = isGroup ? await groupMetadata.participants : ''
-  const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
-  const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
-  const isAdmins = isGroup ? groupAdmins.includes(sender) : false
+
+  let groupMetadata = { subject: '', participants: [] }
+  if (isGroup) {
+    try {
+      groupMetadata = await conn.groupMetadata(from);
+    } catch (e) {
+      // console.error('Failed to get group metadata:', e);
+    }
+  }
+  const groupName = groupMetadata.subject;
+  const participants = groupMetadata.participants || [];
+  const groupAdmins = isGroup ? getGroupAdmins(participants) : [];
+  const isBotAdmins = isGroup ? isParticipantAdmin(participants, [botNumber2, botLid, botNumber + '@s.whatsapp.net']) : false;
+  const isAdmins = isGroup ? isParticipantAdmin(participants, [sender, senderNumber + '@s.whatsapp.net', senderNumber + '@lid']) : false;
   const isReact = m.message.reactionMessage ? true : false
+  // ================ END OF NEW SNIPPET ================
+	  
   const reply = (teks) => {
   conn.sendMessage(from, { text: teks }, { quoted: mek })
   }
