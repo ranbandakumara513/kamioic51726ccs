@@ -21,17 +21,28 @@ async (conn, mek, m, { quoted, reply, isCreator }) => {
             return reply("🖼️ Reply to an image with *.fulldp*");
         }
 
-        // 🔍 Detect message type safely
-        let msgType = Object.keys(quoted.message || {})[0];
+        // 🔓 Extract real message (handle view once / ephemeral)
+        let qmsg = quoted.message || quoted;
+        
+        if (qmsg?.ephemeralMessage) {
+            qmsg = qmsg.ephemeralMessage.message;
+        }
 
-        if (msgType !== "imageMessage") {
+        if (qmsg?.viewOnceMessage) {
+            qmsg = qmsg.viewOnceMessage.message;
+        }
+
+        // 🔍 Find image inside
+        let isImage = qmsg.imageMessage ? true : false;
+
+        if (!isImage) {
             return reply("⚠️ Please reply to an image only.");
         }
 
-        // ⬇️ Download image (correct way)
+        // ⬇️ Download image (this works for all)
         let buffer = await quoted.download();
 
-        // 🧠 Jimp process
+        // 🧠 Jimp processing
         const image = await Jimp.read(buffer);
 
         let w = image.getWidth();
