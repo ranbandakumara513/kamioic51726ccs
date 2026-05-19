@@ -5,7 +5,7 @@ const Baileys = require('@whiskeysockets/baileys');
 
 cmd({
     pattern: "fullpp3",
-    alias: ["pp"],
+    alias: ["pp3"],
     desc: "changes profile picture.",
     category: "owner",
     filename: __filename
