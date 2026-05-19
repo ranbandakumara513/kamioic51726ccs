@@ -4,51 +4,57 @@ const Jimp = require("jimp");
 cmd({
     pattern: "fulldp3",
     alias: ["fullpp3", "setpp3"],
-    desc: "Set full profile picture (HD)",
+    desc: "Set full profile picture",
     category: "owner",
     react: "🖼️",
     filename: __filename
 },
 
-async (conn, mek, m, { quoted, reply, isCreator, mime }) => {
+async (conn, mek, m, { quoted, reply, isCreator }) => {
     try {
 
-        // 🔒 Owner only
-        if (!isCreator) return reply("⚠️ Only bot owner can use this command.");
+        if (!isCreator) {
+            return reply("⚠️ Only bot owner can use this command.");
+        }
 
-        // 📸 Check image
-        if (!quoted) return reply("🖼️ Reply to an image with *.fulldp*");
-        if (!/image/.test(mime)) return reply("⚠️ Please reply to an image only.");
+        if (!quoted) {
+            return reply("🖼️ Reply to an image with *.fulldp*");
+        }
 
-        // ⬇️ Download image buffer
-        let media = await quoted.download();
+        // 🔍 Detect message type safely
+        let msgType = Object.keys(quoted.message || {})[0];
 
-        // 🧠 Jimp processing
-        const image = await Jimp.read(media);
+        if (msgType !== "imageMessage") {
+            return reply("⚠️ Please reply to an image only.");
+        }
 
-        let width = image.getWidth();
-        let height = image.getHeight();
+        // ⬇️ Download image (correct way)
+        let buffer = await quoted.download();
 
-        // 🟩 Crop square (center)
-        let size = Math.min(width, height);
-        let x = (width - size) / 2;
-        let y = (height - size) / 2;
+        // 🧠 Jimp process
+        const image = await Jimp.read(buffer);
+
+        let w = image.getWidth();
+        let h = image.getHeight();
+
+        let size = Math.min(w, h);
+        let x = (w - size) / 2;
+        let y = (h - size) / 2;
 
         image.crop(x, y, size, size);
 
-        // 📏 Resize to HD WhatsApp size
         const final = await image
             .scaleToFit(720, 720)
             .quality(100)
             .getBufferAsync(Jimp.MIME_JPEG);
 
-        // 🚀 Set profile picture (modern Baileys method)
+        // 🚀 Set DP
         await conn.updateProfilePicture(conn.user.id, final);
 
-        reply("✅ *Full HD Profile Picture Updated!*");
+        return reply("✅ Full HD Profile Picture Updated!");
 
-    } catch (err) {
-        console.error(err);
-        reply("❌ Error updating profile picture!");
+    } catch (e) {
+        console.log(e);
+        return reply("❌ Error updating profile picture!");
     }
 });
